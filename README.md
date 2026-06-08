@@ -17,36 +17,20 @@ A Telegram-based CLI tool for searching and downloading movies through bridge bo
 
 ## Setup
 
-### Linux / macOS
-
 ```bash
 # Clone and enter the directory
 git clone https://github.com/yedidya-k/movie-bot
 cd movie-bot
 
-# Create virtual environment and install dependencies
-python3 -m venv venv
-source venv/bin/activate
+# Install dependencies
 pip install -r requirements.txt
 
 # Run setup (creates .env with your credentials)
+# On Linux/macOS:
 chmod +x setup.sh
 ./setup.sh
-```
 
-### Windows
-
-```powershell
-# Clone and enter the directory
-git clone https://github.com/yedidya-k/movie-bot
-cd movie-bot
-
-# Create virtual environment and install dependencies
-python -m venv venv
-.\venv\Scripts\activate
-pip install -r requirements.txt
-
-# Copy and edit the .env file manually
+# On Windows, copy and edit manually:
 copy .env.example .env
 notepad .env
 ```
@@ -66,17 +50,7 @@ PHONE_NUMBER=+1234567890
 
 ## Usage
 
-### Linux / macOS
-
 ```bash
-source venv/bin/activate
-python main.py
-```
-
-### Windows
-
-```powershell
-.\venv\Scripts\activate
 python main.py
 ```
 
