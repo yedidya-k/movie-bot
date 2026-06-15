@@ -29,6 +29,8 @@ class UserClient:
         self._handler_registered = False
         self._pending_movie_request: Optional[asyncio.Future] = None
         self._pending_file: Optional[asyncio.Future] = None
+        self._pending_edit: Optional[asyncio.Future] = None
+        self._pending_edit_info: Optional[tuple] = None
         self._last_buttons: list[ButtonInfo] = []
 
     async def start(self):
@@ -54,6 +56,13 @@ class UserClient:
         async def handler(event):
             try:
                 await self._handle_new_message(event)
+            except Exception:
+                pass
+
+        @self.client.on(events.MessageEdited)
+        async def edit_handler(event):
+            try:
+                await self._handle_message_edit(event)
             except Exception:
                 pass
 
@@ -96,6 +105,67 @@ class UserClient:
                 self._pending_movie_request.set_result(
                     [(b.button, b.bot_username, b.chat_id, b.msg_id) for b in buttons]
                 )
+
+    async def _handle_message_edit(self, event):
+        msg = event.message
+        if not self._pending_edit or self._pending_edit.done():
+            return
+        if not self._pending_edit_info:
+            return
+
+        target_chat_id, target_msg_id = self._pending_edit_info
+        if event.chat_id != target_chat_id or msg.id != target_msg_id:
+            return
+
+        if not msg.reply_markup or not isinstance(msg.reply_markup, ReplyInlineMarkup):
+            return
+
+        sender = await event.get_sender()
+        bot_username = getattr(sender, "username", "") if sender else ""
+
+        buttons: list[ButtonInfo] = []
+        for row in msg.reply_markup.rows:
+            for btn in row.buttons:
+                if isinstance(btn, KeyboardButtonCallback) and btn.data:
+                    buttons.append(ButtonInfo(
+                        button=btn,
+                        bot_username=bot_username,
+                        chat_id=event.chat_id,
+                        msg_id=msg.id,
+                    ))
+
+        if buttons:
+            self._last_buttons = buttons
+            self._pending_edit.set_result(buttons)
+
+    async def click_pagination(self, index: int, timeout: float = 30.0) -> list[str]:
+        if not self.client or not self.client.is_connected():
+            raise ConnectionError("User client not connected")
+
+        if index < 0 or index >= len(self._last_buttons):
+            raise IndexError(f"Invalid button index {index}, have {len(self._last_buttons)}")
+
+        info = self._last_buttons[index]
+
+        loop = asyncio.get_event_loop()
+        self._pending_edit = loop.create_future()
+        self._pending_edit_info = (info.chat_id, info.msg_id)
+
+        await self.client(functions.messages.GetBotCallbackAnswerRequest(
+            peer=info.chat_id,
+            msg_id=info.msg_id,
+            data=info.button.data,
+        ))
+
+        try:
+            edited_buttons = await asyncio.wait_for(self._pending_edit, timeout=timeout)
+            self._last_buttons = edited_buttons
+            return [b.button.text for b in edited_buttons]
+        except asyncio.TimeoutError:
+            raise TimeoutError("Page did not load")
+        finally:
+            self._pending_edit = None
+            self._pending_edit_info = None
 
     async def request_movie(self, movie_name: str, timeout: float = 30.0) -> list[str]:
         if not self.client or not self.client.is_connected():

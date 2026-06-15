@@ -5,6 +5,7 @@ import sys
 
 from config import Config
 from display import (
+    is_page_indicator, is_page_arrow, format_button_text,
     print_banner, prompt_movie_name, show_options,
     prompt_selection, print_status, print_error, print_success,
 )
@@ -64,20 +65,50 @@ async def main():
             print_error("No options returned by bridge bot")
             continue
 
-        show_options(buttons)
-        choice = prompt_selection(len(buttons))
+        while True:
+            display_items = []
+            arrow_indices = set()
+            orig_by_display = {}
+            for i, text in enumerate(buttons):
+                if is_page_indicator(text):
+                    continue
+                display_idx = len(display_items)
+                if is_page_arrow(text):
+                    display_items.append(format_button_text(text))
+                    arrow_indices.add(display_idx)
+                else:
+                    display_items.append(text)
+                orig_by_display[display_idx] = i
 
-        try:
-            path = await uc.select_option(choice - 1)
-            print_success(f"Saved to: {path}")
-            return
-        except TimeoutError:
-            print_error("File did not arrive — try again")
-        except (IndexError, RuntimeError) as e:
-            print_error(str(e))
-        except BaseException as e:
-            logger.error(f"Download failed: {e}")
-            print_error("Download failed — check logs")
+            show_options(display_items)
+            choice = prompt_selection(len(display_items))
+            display_idx = choice - 1
+            orig_idx = orig_by_display[display_idx]
+
+            if display_idx in arrow_indices:
+                try:
+                    buttons = await uc.click_pagination(orig_idx)
+                    continue
+                except TimeoutError:
+                    print_error("Page did not load — try again")
+                    break
+                except Exception as e:
+                    logger.error(f"Pagination failed: {e}")
+                    print_error("Page navigation failed")
+                    break
+
+            try:
+                path = await uc.select_option(orig_idx)
+                print_success(f"Saved to: {path}")
+                return
+            except TimeoutError:
+                print_error("File did not arrive — try again")
+            except (IndexError, RuntimeError) as e:
+                print_error(str(e))
+            except BaseException as e:
+                logger.error(f"Download failed: {e}")
+                print_error("Download failed — check logs")
+            break
 
     await uc.stop()
 

@@ -117,6 +117,27 @@ def prompt_movie_name() -> str:
             return name
 
 
+_PAGE_ARROWS = {"➡️", "⬅️", "→", "←", "➡", "⬅", "▶️", "◀️"}
+
+
+def is_page_indicator(text: str) -> bool:
+    text_clean = text.strip()
+    return bool(re.search(r"(Page|עמוד|📃)", text_clean))
+
+
+def is_page_arrow(text: str) -> bool:
+    return text.strip() in _PAGE_ARROWS
+
+
+def format_button_text(text: str) -> str:
+    stripped = text.strip()
+    if stripped in ("➡️", "→", "➡", "▶️"):
+        return "→ Next page"
+    if stripped in ("⬅️", "←", "⬅", "◀️"):
+        return "← Previous page"
+    return text
+
+
 def show_options(buttons: list[str]) -> None:
     if not buttons:
         cprint(f"  {_w('No options available.', _RED)}")
