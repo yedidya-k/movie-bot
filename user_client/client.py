@@ -151,11 +151,14 @@ class UserClient:
         self._pending_edit = loop.create_future()
         self._pending_edit_info = (info.chat_id, info.msg_id)
 
-        await self.client(functions.messages.GetBotCallbackAnswerRequest(
-            peer=info.chat_id,
-            msg_id=info.msg_id,
-            data=info.button.data,
-        ))
+        try:
+            await self.client(functions.messages.GetBotCallbackAnswerRequest(
+                peer=info.chat_id,
+                msg_id=info.msg_id,
+                data=info.button.data,
+            ))
+        except Exception:
+            pass  # Bot may not answer callback; the edit still happens
 
         try:
             edited_buttons = await asyncio.wait_for(self._pending_edit, timeout=timeout)

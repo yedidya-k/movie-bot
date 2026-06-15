@@ -91,11 +91,11 @@ async def main():
                     continue
                 except TimeoutError:
                     print_error("Page did not load — try again")
-                    break
+                    continue
                 except Exception as e:
                     logger.error(f"Pagination failed: {e}")
                     print_error("Page navigation failed")
-                    break
+                    continue
 
             try:
                 path = await uc.select_option(orig_idx)
