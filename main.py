@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import sys
 
 from config import Config
@@ -33,6 +34,7 @@ async def main():
         print_error("Telethon client not connected — check API_ID, API_HASH, PHONE_NUMBER in .env")
         return
 
+    os.system("cls" if os.name == "nt" else "clear")
     print_banner(config)
 
     while True:

@@ -58,8 +58,6 @@ class UserClient:
                 pass
 
         self._handler_registered = True
-        bots = len(self.config.bridge_bots)
-        logger.info(f"User client started, monitoring {bots} bridge bot(s)")
 
     async def _is_bridge_bot(self, event) -> Optional[str]:
         sender = await event.get_sender()
