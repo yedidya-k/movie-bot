@@ -53,35 +53,6 @@ while true; do
 done
 
 while true; do
-    read -p "GROUP_IDS (comma-separated, e.g., -100111,-100222): " GROUP_IDS
-    if [ -z "$GROUP_IDS" ]; then
-        echo "Error: GROUP_IDS cannot be empty"
-        continue
-    fi
-    valid=true
-    IFS=',' read -ra PARTS <<< "$GROUP_IDS"
-    for part in "${PARTS[@]}"; do
-        if ! [[ "$part" =~ ^-?[0-9]+$ ]]; then
-            echo "Error: '$part' is not a valid group ID (must be an integer)"
-            valid=false
-            break
-        fi
-    done
-    if [ "$valid" = true ]; then
-        break
-    fi
-done
-while true; do
-    read -p "BRIDGE_GROUP_ID (optional): " BRIDGE_GROUP_ID
-    if [ -z "$BRIDGE_GROUP_ID" ]; then
-        break
-    fi
-    if [[ "$BRIDGE_GROUP_ID" =~ ^-?[0-9]+$ ]]; then
-        break
-    fi
-    echo "Error: BRIDGE_GROUP_ID must be an integer"
-done
-while true; do
     read -p "BRIDGE_BOTS (comma-separated, e.g., @SerchtAsBot): " BRIDGE_BOTS
     if [ -z "$BRIDGE_BOTS" ]; then
         echo "Error: BRIDGE_BOTS cannot be empty"
@@ -110,8 +81,6 @@ done
 # Write .env
 cat > "$ENV_FILE" << EOF
 DOWNLOAD_PATH=$DOWNLOAD_PATH
-GROUP_IDS=$GROUP_IDS
-BRIDGE_GROUP_ID=$BRIDGE_GROUP_ID
 BRIDGE_BOTS=$BRIDGE_BOTS
 
 API_ID=$API_ID

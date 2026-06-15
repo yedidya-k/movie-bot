@@ -58,8 +58,8 @@ class UserClient:
                 pass
 
         self._handler_registered = True
-        groups = len(self.config.group_ids)
-        logger.info(f"User client started, monitoring {groups} group(s)")
+        bots = len(self.config.bridge_bots)
+        logger.info(f"User client started, monitoring {bots} bridge bot(s)")
 
     async def _is_bridge_bot(self, event) -> Optional[str]:
         sender = await event.get_sender()
@@ -108,10 +108,8 @@ class UserClient:
         if self._pending_movie_request is None:
             self._pending_movie_request = loop.create_future()
 
-        for gid in self.config.group_ids:
-            await self.client.send_message(gid, movie_name)
-        if self.config.bridge_group_id:
-            await self.client.send_message(self.config.bridge_group_id, movie_name)
+        for bot in self.config.bridge_bots:
+            await self.client.send_message(bot, movie_name)
 
         print_status("Waiting for bridge bot response...")
 

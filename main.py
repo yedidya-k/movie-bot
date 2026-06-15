@@ -33,8 +33,6 @@ async def main():
         print_error("Telethon client not connected — check API_ID, API_HASH, PHONE_NUMBER in .env")
         return
 
-    import os
-    os.system("cls" if os.name == "nt" else "clear")
     print_banner(config)
 
     while True:

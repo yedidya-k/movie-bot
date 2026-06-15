@@ -7,12 +7,6 @@ class Config:
 
         self.download_path = env.get("DOWNLOAD_PATH", "./downloads/")
 
-        raw_groups = env.get("GROUP_IDS", "")
-        self.group_ids = [int(x.strip()) for x in raw_groups.split(",") if x.strip()]
-
-        raw_bridge = env.get("BRIDGE_GROUP_ID", "")
-        self.bridge_group_id = int(raw_bridge) if raw_bridge.strip() else None
-
         raw_bots = env.get("BRIDGE_BOTS", "")
         self.bridge_bots = [x.strip() for x in raw_bots.split(",") if x.strip()]
 

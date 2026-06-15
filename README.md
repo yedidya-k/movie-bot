@@ -4,8 +4,8 @@ A Telegram-based CLI tool for searching and downloading movies through bridge bo
 
 ## How It Works
 
-1. You send a movie name to configured Telegram groups
-2. Bridge bots in those groups respond with available options
+1. You send a movie name directly to bridge bots via Telegram private chat
+2. A bridge bot responds with available quality options
 3. You select an option and the bot sends you the file
 4. Movie Bot downloads it to your machine
 
@@ -13,7 +13,7 @@ A Telegram-based CLI tool for searching and downloading movies through bridge bo
 
 - Python 3.11+
 - Telegram API credentials ([my.telegram.org](https://my.telegram.org))
-- Access to a Telegram group with a bridge bot
+- Access to a Telegram bridge bot (by @username)
 
 ## Setup
 
@@ -39,8 +39,6 @@ Or manually create a `.env` file:
 
 ```
 DOWNLOAD_PATH=./downloads/
-GROUP_IDS=-1001111111111,-1002222222222
-BRIDGE_GROUP_ID=-1003333333333
 BRIDGE_BOTS=@ExampleBot
 
 API_ID=12345
@@ -61,11 +59,9 @@ The session is saved so you only need to authenticate via Telegram once. The fir
 ## Configuration
 
 | Variable | Description |
-|---|---|
+|---|---|---|
 | `DOWNLOAD_PATH` | Where downloaded files are saved (default: `./downloads/`) |
-| `GROUP_IDS` | Comma-separated group IDs to send search queries to |
-| `BRIDGE_GROUP_ID` | Optional — additional group for bridge bot responses |
-| `BRIDGE_BOTS` | Comma-separated bot usernames (with @) that provide movie links |
+| `BRIDGE_BOTS` | Comma-separated bot usernames (with @) to send movie queries to |
 | `API_ID` | Telegram API ID from my.telegram.org |
 | `API_HASH` | Telegram API hash from my.telegram.org |
 | `PHONE_NUMBER` | Your phone number (international format) |

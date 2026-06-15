@@ -98,7 +98,6 @@ def print_banner(config) -> None:
     rows = [
         (f"{_Style.DIM}Download path{_Style.RESET}", f"{_Style.BOLD}{config.download_path}{_Style.RESET}"),
         (f"{_Style.DIM}Bridge bots{_Style.RESET}", f"{_Style.BOLD}{', '.join(config.bridge_bots)}{_Style.RESET}"),
-        (f"{_Style.DIM}Groups{_Style.RESET}", f"{_Style.BOLD}{len(config.group_ids)}{_Style.RESET} {_Style.DIM}configured{_Style.RESET}"),
     ]
 
     label_w = max(len(_strip_ansi(l)) for l, _ in rows)
